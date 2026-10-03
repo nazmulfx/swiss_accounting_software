@@ -9,4 +9,5 @@ WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
 MERCHANTABLITY OR NON-INFRINGEMENT.
 
 ***************************************************************************** */
-export const updateMessage = window.frappe._("Uploading QR Bill");
+// Translate on use, so translations are loaded by then
+export const updateMessage = () => __("Uploading QR Bill");

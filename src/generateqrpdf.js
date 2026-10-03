@@ -17,7 +17,7 @@ import { showError, showProgress, uploadFileAsAttachment } from "./utils";
 export const generateQRPDF = (paymentinfo, docname, frm, language) => {
 
   try {
-    showProgress(10, "initializing pdf...");
+    showProgress(10, __("initializing pdf..."));
 
     const pdf = new PDFDocument();
     const chunks = [];
@@ -29,7 +29,7 @@ export const generateQRPDF = (paymentinfo, docname, frm, language) => {
     
     pdf.on("end", () => {
 
-      showProgress(80, "uploading pdf...");
+      showProgress(80, __("uploading pdf..."));
       // Create a Blob from the chunks
       const blob = new Blob(chunks, { type: "application/pdf" });
       uploadFileAsAttachment(blob, docname, frm);
@@ -40,7 +40,7 @@ export const generateQRPDF = (paymentinfo, docname, frm, language) => {
     const qrBill = new SwissQRBill(paymentinfo);
     qrBill.attachTo(pdf);
 
-    showProgress(60, "generating pdf...");
+    showProgress(60, __("generating pdf..."));
     
     pdf.end(); // finalize    
 

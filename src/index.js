@@ -38,7 +38,7 @@ window.frappe.ui.form.on("Sales Invoice", {
     frm.doc.esr_reference_code = reference;
   },
   refresh: (frm) => {
-    frm.add_custom_button("Create QR Bill", function () {
+    frm.add_custom_button(__("Create QR Bill"), function () {
       createQRBill(frm);
     });
   },

@@ -64,7 +64,7 @@ const confirmWithoutCompanyAddress = (company) =>
   });
 
 export const createQRBill = async (frm) => {
-  showProgress(10, "getting data...");
+  showProgress(10, __("getting data..."));
   var customer = ""
 
   // If customer name exists separately
@@ -91,7 +91,7 @@ export const createQRBill = async (frm) => {
     window.frappe.hide_progress();
     const proceed = await confirmWithoutCompanyAddress(company);
     if (!proceed) return;
-    showProgress(10, "getting data...");
+    showProgress(10, __("getting data..."));
   }
 
   const companyAddress = companyAddressName
@@ -103,7 +103,7 @@ export const createQRBill = async (frm) => {
   );
   const { iban } = await getDocument("Bank Account", bankAccount);
 
-  showProgress(40, "generating pdf...");
+  showProgress(40, __("generating pdf..."));
 
   const customerCountry = await getDocument("Country", customerAddress.country);
 

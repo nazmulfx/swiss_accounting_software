@@ -19,7 +19,7 @@ import { updateMessage } from "./message";
  * @param {String} description Desciption
  */
 export const showProgress = (current, description) => {
-  const title = updateMessage;
+  const title = updateMessage();
   const total = 100;
   window.frappe.show_progress(title, current, total, description, true);
 };
@@ -56,7 +56,7 @@ export const uploadFileAsAttachment = (file, docname, frm) => {
       method: "POST",
       body: formdata,
     }).then(() => {
-      showProgress(100, "done");
+      showProgress(100, __("done"));
       frm.reload_doc();
     });
   };
@@ -148,5 +148,5 @@ export const getCurrency = (currency) => {
   if (currency === "CHF" || currency === "EUR") {
     return currency;
   }
-  showError("Currency Should Be Either CHF or EUR");
+  showError(__("Currency Should Be Either CHF or EUR"));
 };
