@@ -25,6 +25,40 @@ export const showProgress = (current, description) => {
 };
 
 /**
+ * Hides Progress Bar And Resolves Once It Is Fully Closed
+ * Bootstrap ignores hide() while the dialog is still fading in,
+ * so wait for "shown" first when it is mid-transition.
+ * @returns {Promise<void>}
+ */
+export const hideProgress = () =>
+  new Promise((resolve) => {
+    const dialog = window.frappe.cur_progress;
+    if (!dialog) return resolve();
+
+    const $wrapper = dialog.$wrapper;
+    const hide = () => {
+      $wrapper.one("hidden.bs.modal", () => resolve());
+      window.frappe.hide_progress();
+    };
+
+    const modal = $wrapper.data("bs.modal");
+    if (!modal || (!modal._isShown && !modal._isTransitioning)) {
+      // Already closed, so no "hidden" event will fire
+      window.frappe.hide_progress();
+      resolve();
+    } else if (!modal._isShown) {
+      // Already closing
+      window.frappe.cur_progress = null;
+      $wrapper.one("hidden.bs.modal", () => resolve());
+    } else if (modal._isTransitioning) {
+      // Still fading in
+      $wrapper.one("shown.bs.modal", hide);
+    } else {
+      hide();
+    }
+  });
+
+/**
  * Creates Filename For Uploading File
  * @param {String} name Name of File
  * @returns String

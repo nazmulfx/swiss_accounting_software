@@ -16,6 +16,7 @@ import {
   getDocument,
   getLanguageCode,
   getReferenceCode,
+  hideProgress,
   showError,
   showProgress,
 } from "./utils";
@@ -71,8 +72,8 @@ const docLink = (route, name) =>
  * @returns {Promise<Boolean>} True If User Wants To Proceed
  */
 const confirmWithoutAddress = (message, question) =>
-  new Promise((resolve) => {
-    window.frappe.hide_progress();
+  new Promise(async (resolve) => {
+    await hideProgress();
     window.frappe.confirm(
       message + "<br><br>" + question,
       () => resolve(true),
