@@ -43,7 +43,7 @@ export const generateQRConfig = (
     name: company, //
     address: companyAddress.address_line1.substring(0, 70),
     buildingNumber: companyAddress.address_line2 != null ? companyAddress.address_line2.substring(0,16) : undefined, // Optional Address line2, according to Type "S" specification
-    zip: parseInt(companyAddress.pincode), // Bank Account  Code
+    zip: companyAddress.pincode ? parseInt(companyAddress.pincode) : "", // Bank Account  Code
     city: companyAddress.city, // Bank Account City
     account: iban, // Bank Account Iban
     country: companyAddressCode, // Bank Country

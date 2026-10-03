@@ -20,6 +20,49 @@ import {
   showProgress,
 } from "./utils";
 
+const EMPTY_ADDRESS = {
+  address_line1: "",
+  address_line2: null,
+  pincode: "",
+  city: "",
+};
+
+/**
+ * Returns Default Address Linked To Company
+ * @param {String} company Company Name
+ * @returns {Promise<String|undefined>} Address Name
+ */
+const getDefaultCompanyAddress = async (company) => {
+  const r = await window.frappe.call({
+    method: "erpnext.setup.doctype.company.company.get_default_company_address",
+    args: { name: company },
+  });
+  return r && r.message;
+};
+
+/**
+ * Asks User To Continue Without Company Address
+ * @param {String} company Company Name
+ * @returns {Promise<Boolean>} True If User Wants To Proceed
+ */
+const confirmWithoutCompanyAddress = (company) =>
+  new Promise((resolve) => {
+    const companyLink = `<a href="/app/company/${encodeURIComponent(
+      company
+    )}">${window.frappe.utils.escape_html(company)}</a>`;
+    // Use the global __() so `bench generate-pot-file` extracts these strings
+    window.frappe.confirm(
+      __(
+        "No address found for company {0}. Please link an address with the company.",
+        [companyLink]
+      ) +
+        "<br><br>" +
+        __("Do you want to proceed without company address?"),
+      () => resolve(true),
+      () => resolve(false)
+    );
+  });
+
 export const createQRBill = async (frm) => {
   showProgress(10, "getting data...");
   var customer = ""
@@ -40,7 +83,20 @@ export const createQRBill = async (frm) => {
   const currency = getCurrency(frm.doc.currency);
   if (!currency) return;
 
-  const companyAddress = await getDocument("Address", frm.doc.company_address);
+  // Use the invoice's company address, else the address linked to the company
+  const companyAddressName =
+    frm.doc.company_address || (await getDefaultCompanyAddress(company));
+
+  if (!companyAddressName) {
+    window.frappe.hide_progress();
+    const proceed = await confirmWithoutCompanyAddress(company);
+    if (!proceed) return;
+    showProgress(10, "getting data...");
+  }
+
+  const companyAddress = companyAddressName
+    ? await getDocument("Address", companyAddressName)
+    : EMPTY_ADDRESS;
   const customerAddress = await getDocument(
     "Address",
     frm.doc.customer_address
@@ -49,10 +105,12 @@ export const createQRBill = async (frm) => {
 
   showProgress(40, "generating pdf...");
 
-  const companyCountry = await getDocument("Country", companyAddress.country);
   const customerCountry = await getDocument("Country", customerAddress.country);
 
-  const companyAddressCode = companyCountry.code.toUpperCase();
+  // Without a company address, take the country from the IBAN (CH / LI)
+  const companyAddressCode = companyAddressName
+    ? (await getDocument("Country", companyAddress.country)).code.toUpperCase()
+    : iban.substring(0, 2).toUpperCase();
   const customerAddressCode = customerCountry.code.toUpperCase();
 
   const config = generateQRConfig(
