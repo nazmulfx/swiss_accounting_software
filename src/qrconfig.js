@@ -48,12 +48,13 @@ export const generateQRConfig = (
     account: iban, // Bank Account Iban
     country: companyAddressCode, // Bank Country
   },
-  debtor: {
+  // Debtor is optional; without a customer address the bill shows an empty "Payable by" box
+  debtor: customerAddress ? {
     name: customer.substring(0, 70), // Customer Doctype,
     address: customerAddress.address_line1.substring(0, 70),
     buildingNumber: customerAddress.address_line2 != null ? customerAddress.address_line2.substring(0,16) : undefined, // Optional Address line2, according to Type "S" specification
     zip: customerAddress.pincode, // Sales Invoice PCode
     city: customerAddress.city, // Sales Invoice City
     country: customerAddressCode, // Sales Invoice Country
-  },
+  } : undefined,
 });
